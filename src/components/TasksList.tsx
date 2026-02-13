@@ -5,33 +5,68 @@ import type { Task, Crypto } from '../types/task';
 
 interface TasksListProps {
     filterBy: string;
-    handleChangeFilter: (filterBy: string) => void;
+    setFilterBy: React.Dispatch<React.SetStateAction<string>>;
     filteredTasks: Task[];
     editTargetFocus: Task | null;
     setEditTargetFocus: React.Dispatch<React.SetStateAction<Task | null>>;
     priorityEdit: Crypto | null;
     setPriorityEdit: React.Dispatch<React.SetStateAction<Crypto | null>>;
-    prioritys: number[];
-    handleChangeTaskStatus: (task: Task) => void;
-    handleChangePriority: (task: Task, priority: number) => void;
-    handleEditTask: (task: Task) => void;
-    handleRemoveTask: (task: Task) => void;
+    setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
+    setEditTask: React.Dispatch<React.SetStateAction<Task | null>>
+    editTask: Task | null
 }
 
 const TasksList = ({
     filterBy,
-    handleChangeFilter,
+    setFilterBy,
     filteredTasks,
     editTargetFocus,
     setEditTargetFocus,
     priorityEdit,
     setPriorityEdit,
-    prioritys,
-    handleChangeTaskStatus,
-    handleChangePriority,
-    handleEditTask,
-    handleRemoveTask,
+    setTasks,
+    setEditTask,
+    editTask,
 }: TasksListProps) => {
+
+    const handleChangeTaskStatus = (task: Task) => {
+        task.status = task.status === "Completed" ? "Uncompleted" : "Completed"
+        setTasks((prev) => [...prev.filter((t) => t.id !== task.id), task])
+    }
+
+    const handleEditTask = (task: Task) => {
+        editTask ? setEditTask(null) : setEditTask(task)
+    }
+
+    const handleRemoveTask = (task: Task) => {
+        setTasks(prev => prev.filter(t => t !== task))
+    }
+
+    const handleChangeFilter = (filterBy: string) => {
+        if (filterBy === "All") {
+          setFilterBy("Completed")
+        } else if (filterBy === "Completed") {
+          setFilterBy("Uncompleted")
+        } else {
+          setFilterBy("All")
+        }
+      }
+
+    const handleChangePriority = (task: Task, priority: number) => {
+        task.priority = priority
+        setTasks((prev) => [...prev.filter((t) => t !== task), task])
+        setPriorityEdit(null)
+    }
+
+    const priorityColors = ['#be123c', '#f97316', '#84cc16', '#3b82f6']
+
+    const prioritys = [1, 2, 3, 4]
+    
+    const resetValues = (): void => {
+        setEditTargetFocus(null)
+        setEditTask(null)
+    }
+
     return (
         <div className='flex flex-col w-full'>
             <span
@@ -50,7 +85,7 @@ const TasksList = ({
                         <div
                             onClick={() => {
                                 editTargetFocus === task
-                                    ? setEditTargetFocus(null)
+                                    ? resetValues()
                                     : setEditTargetFocus(task)
                             }}
                             className={
@@ -74,74 +109,58 @@ const TasksList = ({
                                 className='text-xl'
                                 onClick={(event) => event.stopPropagation()}
                             >
-                                {task.text}
+                                {task.title}
                             </span>
-                            {priorityEdit === task.id && (
-                                <div onMouseLeave={() => setPriorityEdit(null)} className='flex flex-row gap-0.5 border rounded-full'>
-                                    {prioritys
-                                        .filter(priority => priority != task.priority)
-                                        .map(priority => (
-                                            <button
-                                                key={priority}
-                                                onClick={(event) => {
-                                                    event.stopPropagation()
-                                                    handleChangePriority(task, priority)
-                                                }}
-                                                className='border active:bg-blue-400 rounded-full p-2 w-8 h-8 cursor-pointer relative'
-                                            >
-                                                <span className='block absolute inset-0 font-bold text-xl'>
-                                                    {priority}
-                                                </span>
-                                            </button>
-                                        ))}
-                                    <button
-                                        onClick={(event) => {
-                                            priorityEdit === task.id ? setPriorityEdit(null) : setPriorityEdit(task.id)
-                                            event.stopPropagation()
-                                        }}
-                                        className='border rounded-full p-2 w-8 h-8 cursor-pointer relative text-[#f5f5f5] bg-[#3be13294]'
+                            <div onMouseLeave={() => setPriorityEdit(null)} className='flex flex-row gap-0.5 border rounded-full'>
+                                {priorityEdit === task.id && prioritys.filter(p => p !== task.priority).map(priority => (
+                                    <button key={crypto.randomUUID()} onClick={(event) => {
+                                        event.stopPropagation()
+                                        handleChangePriority(task, priority)
+                                    }} className='border rounded-full p-2 w-8 h-8 cursor-pointer relative'
+                                        style={{ backgroundColor: priorityColors[priority - 1] }}
                                     >
                                         <span className='block absolute inset-0 font-bold text-xl'>
-                                            {task.priority}
+                                            {priority}
                                         </span>
                                     </button>
-                                </div>
-                            )}
-                            {priorityEdit !== task.id && (
-                                <button
-                                    onClick={(event) => {
-                                        setPriorityEdit(task.id)
-                                        event.stopPropagation()
-                                    }}
-                                    className='border rounded-full p-2 w-8 h-8 cursor-pointer relative'
+                                ))}
+
+                                <button onClick={(event) => {
+                                    priorityEdit === task.id ? setPriorityEdit(null) : setPriorityEdit(task.id)
+                                    event.stopPropagation()
+                                }}
+                                    className={'border rounded-full p-2 w-8 h-8 cursor-pointer relative ' + (priorityEdit === task.id && 'text-[#f5f5f5]')}
+                                    style={{ backgroundColor: priorityColors[task.priority - 1] }}
                                 >
                                     <span className='block absolute inset-0 font-bold text-xl'>
                                         {task.priority}
                                     </span>
                                 </button>
-                            )}
+                            </div>
                         </div>
-                        <div className={'w-full border mb-1 ' + (editTargetFocus === task ? "block" : "hidden")}></div>
-                        <div className={'flex-row w-full justify-around ' + (editTargetFocus === task ? "flex" : "hidden")}>
+                        <div className={'w-full border-y-2 my-1 p-1 ' + (editTargetFocus === task ? "block" : "hidden")}>
+                            <span>{task.description || "Has no description"}</span>
+                        </div>
+                        <div className={'flex-row w-full justify-around mb-1 ' + (editTargetFocus === task ? "flex" : "hidden")}>
                             <button
-                                className='rounded-full border p-1 cursor-pointer'
-                                onClick={() => handleEditTask(task)}
+                                className={'rounded-full border p-1 cursor-pointer ' + (editTask ? 'bg-lime-400' : '')}
+                                onClick={() => {handleEditTask(task)}}
                             >
                                 <MdEdit />
                             </button>
                             <button
-                                className='rounded-full border p-1 cursor-pointer'
+                                className='rounded-full border p-1 cursor-pointer bg-rose-500 text-white'
                                 onClick={() => handleRemoveTask(task)}
                             >
                                 <GrClose />
                             </button>
                         </div>
-                    </li>
+                    </li >
                 )) : (
                     <li className='text-center border rounded-2xl p-1'>No Tasks</li>
                 )}
-            </ul>
-        </div>
+            </ul >
+        </div >
     )
 }
 

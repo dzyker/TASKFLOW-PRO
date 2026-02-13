@@ -1,6 +1,6 @@
 import './App.css'
 import type React from 'react';
-import { useState, useEffect, useMemo, useRef } from "react"
+import { useState, useEffect, useMemo } from "react"
 
 import Header from './components/Header';
 import Form from './components/Form';
@@ -9,15 +9,17 @@ import TasksList from './components/TasksList';
 import Quote from './components/Quote';
 
 import type { Crypto, Task } from './types/task';
+import EditWindow from './components/EditWindow';
 
 function App() {
 
-  const [newTask, setNewTask] = useState<string>('')
   const [editTargetFocus, setEditTargetFocus] = useState<Task | null>(null)
   const [priorityEdit, setPriorityEdit] = useState<Crypto | null>(null)
   const [filterBy, setFilterBy] = useState<string>('All')
+  const [reverseSort, setReverseSort] = useState<boolean>(false)
   const [sortBy, setSortBy] = useState<string>('Priority')
   const [tasks, setTasks] = useState<Task[]>([])
+  const [editTask, setEditTask] = useState<Task | null>(null)
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -29,15 +31,45 @@ function App() {
 
       setEditTargetFocus(null);
     };
-
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
-  }, []);
-
-  const prioritys = [1, 2, 3, 4]
-
+  }, [sortBy]);
+  
   const filteredTasks = useMemo(() => {
+
+    const sortTasks = (result: Task[], sortBy: string, reverseSort: boolean) => {
+      if (reverseSort) {
+        if (sortBy === "Priority") {
+          result.sort((a, b) => b.priority - a.priority)
+        } else if (sortBy === "Status") {
+          result.sort((a, b) => {
+            if (a.status === b.status) return 0
+            if (a.status === "Completed") return -1
+            if (a.status === "Ccompleted") return 1
+            return 0
+          })
+        } else if (sortBy === "Date") {
+          result.sort((a, b) => a.date.getTime() - b.date.getTime())
+        }
+      } else {
+        if (sortBy === "Priority") {
+          result.sort((a, b) => a.priority - b.priority)
+        } else if (sortBy === "Status") {
+          result.sort((a, b) => {
+            if (a.status === b.status) return 0
+            if (a.status === "Uncompleted") return -1
+            if (a.status === "Uncompleted") return 1
+            return 0
+          })
+        } else if (sortBy === "Date") {
+          result.sort((a, b) => b.date.getTime() - a.date.getTime())
+        }
+      }
+      return result
+    }
+
     let result = [...tasks]
+    result = sortTasks(result, sortBy, reverseSort)
     if (filterBy === "All") {
       return result
     } else if (filterBy === "Completed") {
@@ -45,67 +77,10 @@ function App() {
     } else if (filterBy === "Uncompleted") {
       result = result.filter((task) => task.status === "Uncompleted")
     }
-    // sortTasks()
-    return result
-  } , [tasks, filterBy])
+    return result 
+  } , [tasks, filterBy, sortBy, reverseSort])
 
-  const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!event.target.value.trim()) {
-      setNewTask('')
-    }
-    setNewTask(event.target.value)
-  }
-
-  const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    if (!newTask) {
-      setNewTask('')
-      return
-    }
-    setTasks((prev) => [...prev, {
-        id: crypto.randomUUID(),
-        text: newTask.trim(),
-        date: new Date(),
-        status: 'Uncompleted',
-        priority: 4,
-      }
-    ])
-    setNewTask('')
-  }
-
-  const sortTasks = () => {
-    
-  }
   
-  const handleChangeFilter = (filterBy: string) => {
-    if (filterBy === "All") {
-      setFilterBy("Completed")
-    } else if (filterBy === "Completed") {
-      setFilterBy("Uncompleted")
-    } else {
-      setFilterBy("All")
-    }
-  }
-
-  const handleChangePriority = (task: Task, priority: number) => {
-    task.priority = priority
-    setTasks((prev) => [...prev.filter((t) => t !== task), task])
-    setPriorityEdit(null)
-  }
-
-  const handleChangeTaskStatus = (task: Task) => {
-    task.status = task.status === "Completed" ? "Uncompleted" : "Completed"
-    setTasks((prev) => [...prev.filter((t) => t.id !== task.id), task])
-  }
-
-  const handleEditTask = (task: Task) => {
-    
-  }
-
-  const handleRemoveTask = (task: Task) => {
-    
-  }
-
   // add to localStorage
 
   return (
@@ -114,30 +89,29 @@ function App() {
         <Header />
 
         <div className='flex flex-row gap-10 w-full px-6 py-4 h-full'>
-          <div className='flex flex-col justify-between w-4/5'>
+          <div className='flex flex-col w-4/5'>
             <Form
-              handleFormSubmit={handleFormSubmit}
-              handleInput={handleInput}
-              newTask={newTask}
+              tasks={tasks}
+              setTasks={setTasks}
             />
 
-            <Sort sortBy={sortBy} setSortBy={setSortBy} />
+            <Sort sortBy={sortBy} setSortBy={setSortBy} reverseSort={reverseSort} setReverseSort={setReverseSort}/>
+
+            {editTask && editTargetFocus && <EditWindow task={editTask} />}
           </div>
 
           <div className='flex flex-col w-full'>
             <TasksList
               filterBy={filterBy}
-              handleChangeFilter={handleChangeFilter}
+              setFilterBy={setFilterBy}
               filteredTasks={filteredTasks}
               editTargetFocus={editTargetFocus}
               setEditTargetFocus={setEditTargetFocus}
               priorityEdit={priorityEdit}
               setPriorityEdit={setPriorityEdit}
-              prioritys={prioritys}
-              handleChangeTaskStatus={handleChangeTaskStatus}
-              handleChangePriority={handleChangePriority}
-              handleEditTask={handleEditTask}
-              handleRemoveTask={handleRemoveTask}
+              setTasks={setTasks}
+              setEditTask={setEditTask}
+              editTask={editTask}
             />
             <Quote />
           </div>
