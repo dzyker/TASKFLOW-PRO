@@ -1,7 +1,7 @@
 import './App.css'
+import type React from 'react';
 import { useState, useEffect, useMemo, useRef } from "react"
-import { GrClose, GrCheckmark } from "react-icons/gr";
-import { MdEdit } from "react-icons/md";
+
 import Header from './components/Header';
 import Form from './components/Form';
 import Sort from './components/Sort';
@@ -56,7 +56,7 @@ function App() {
     setNewTask(event.target.value)
   }
 
-  const handleFormSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
+  const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (!newTask) {
       setNewTask('')
@@ -87,8 +87,10 @@ function App() {
     }
   }
 
-  const handleChangePriority = (taskId: Crypto) => {
-
+  const handleChangePriority = (task: Task, priority: number) => {
+    task.priority = priority
+    setTasks((prev) => [...prev.filter((t) => t !== task), task])
+    setPriorityEdit(null)
   }
 
   const handleChangeTaskStatus = (task: Task) => {
@@ -113,13 +115,30 @@ function App() {
 
         <div className='flex flex-row gap-10 w-full px-6 py-4 h-full'>
           <div className='flex flex-col justify-between w-4/5'>
-            <Form handleFormSubmit={handleFormSubmit} handleInput={handleInput} newTask={newTask} />
+            <Form
+              handleFormSubmit={handleFormSubmit}
+              handleInput={handleInput}
+              newTask={newTask}
+            />
 
             <Sort sortBy={sortBy} setSortBy={setSortBy} />
           </div>
 
           <div className='flex flex-col w-full'>
-            <TasksList />
+            <TasksList
+              filterBy={filterBy}
+              handleChangeFilter={handleChangeFilter}
+              filteredTasks={filteredTasks}
+              editTargetFocus={editTargetFocus}
+              setEditTargetFocus={setEditTargetFocus}
+              priorityEdit={priorityEdit}
+              setPriorityEdit={setPriorityEdit}
+              prioritys={prioritys}
+              handleChangeTaskStatus={handleChangeTaskStatus}
+              handleChangePriority={handleChangePriority}
+              handleEditTask={handleEditTask}
+              handleRemoveTask={handleRemoveTask}
+            />
             <Quote />
           </div>
         </div>

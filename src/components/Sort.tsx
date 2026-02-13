@@ -1,9 +1,11 @@
-interface Props {
-    sortBy: string;
-    setSortBy: React.Dispatch<React.SetStateAction<string>>;
-  }
+import type React from 'react';
 
-const Sort = ({sortBy, setSortBy}: Props) => {
+interface Props {
+  sortBy: string;
+  setSortBy: React.Dispatch<React.SetStateAction<string>>;
+}
+
+const Sort = ({ sortBy, setSortBy }: Props) => {
     return (
         <div className='flex flex-col gap-3 mb-16 text-center'>
             <span data-safe-click="true" className='text-xl block w-full'>Sort By:</span>
