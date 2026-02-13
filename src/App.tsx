@@ -30,6 +30,7 @@ function App() {
       if (isInside) return;
 
       setEditTargetFocus(null);
+      setEditTask(null)
     };
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
@@ -97,7 +98,7 @@ function App() {
 
             <Sort sortBy={sortBy} setSortBy={setSortBy} reverseSort={reverseSort} setReverseSort={setReverseSort}/>
 
-            {editTask && editTargetFocus && <EditWindow task={editTask} />}
+            {editTask && editTargetFocus && <EditWindow task={editTask} setTasks={setTasks} setEditTask={setEditTask} />}
           </div>
 
           <div className='flex flex-col w-full'>

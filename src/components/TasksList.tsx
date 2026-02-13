@@ -62,9 +62,14 @@ const TasksList = ({
 
     const prioritys = [1, 2, 3, 4]
     
-    const resetValues = (): void => {
+    const changeValues1 = (): void => {
         setEditTargetFocus(null)
         setEditTask(null)
+    }
+
+    const changeValues2 = (task: Task): void => {
+        setEditTask(null)
+        setEditTargetFocus(task)
     }
 
     return (
@@ -85,8 +90,8 @@ const TasksList = ({
                         <div
                             onClick={() => {
                                 editTargetFocus === task
-                                    ? resetValues()
-                                    : setEditTargetFocus(task)
+                                    ? changeValues1()
+                                    : changeValues2(task)
                             }}
                             className={
                                 'flex flex-row align-middle justify-between rounded-t-2xl p-1 px-5 ' +
@@ -150,7 +155,11 @@ const TasksList = ({
                             </button>
                             <button
                                 className='rounded-full border p-1 cursor-pointer bg-rose-500 text-white'
-                                onClick={() => handleRemoveTask(task)}
+                                onClick={() => {
+                                    handleRemoveTask(task)
+                                    setEditTargetFocus(null)
+                                    setEditTask(null)
+                                }}
                             >
                                 <GrClose />
                             </button>
