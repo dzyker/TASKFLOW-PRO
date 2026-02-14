@@ -1,5 +1,4 @@
 import './App.css'
-import type React from 'react';
 import { useState, useEffect, useMemo } from "react"
 
 import Header from './components/Header';
@@ -85,14 +84,13 @@ function App() {
   // add to localStorage
 
   return (
-    <div className='flex align-middle justify-center bg-[url("./assets/background.jpg")] bg-cover bg-center bg-no-repeat h-screen p-20'>
-      <div className='flex flex-col lg:min-h-80 lg:min-w-230 border-2 border-white/40 backdrop-blur rounded-4xl'>
+    <div className='flex align-middle justify-center bg-[url("./assets/background.jpg")] bg-cover bg-center bg-no-repeat min-h-screen p-8 sm:p-16 md:pt-10 md:px-18 lg:px-30 lg:py-20'>
+      <div className='flex flex-col w-full max-w-7xl lg:min-h-80 border-2 border-white/40 backdrop-blur rounded-2xl sm:rounded-3xl lg:rounded-4xl'>
         <Header />
 
-        <div className='flex flex-row gap-10 w-full px-6 py-4 h-full'>
-          <div className='flex flex-col'>
+        <div className='flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-10 w-full px-3 sm:px-4 md:px-6 py-3 sm:py-4 h-full'>
+          <div className='flex flex-col w-full lg:w-auto'>
             <Form
-              tasks={tasks}
               setTasks={setTasks}
             />
 
