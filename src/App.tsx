@@ -10,6 +10,36 @@ import Quote from './components/Quote';
 import type { Crypto, Task } from './types/task';
 import EditWindow from './components/EditWindow';
 
+const STORAGE_KEY = 'taskflow-pro-tasks';
+
+const loadTasksFromStorage = (): Task[] => {
+  try {
+    const storedTasks = localStorage.getItem(STORAGE_KEY);
+    if (storedTasks) {
+      const parsedTasks = JSON.parse(storedTasks);
+      return parsedTasks.map((task: Omit<Task, 'date'> & { date: string }) => ({
+        ...task,
+        date: new Date(task.date)
+      }));
+    }
+  } catch (error) {
+    console.error('Ошибка при загрузке задач из localStorage:', error);
+  }
+  return [];
+};
+
+const saveTasksToStorage = (tasks: Task[]): void => {
+  try {
+    const tasksToSave = tasks.map(task => ({
+      ...task,
+      date: task.date.toISOString()
+    }));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasksToSave));
+  } catch (error) {
+    console.error('Ошибка при сохранении задач в localStorage:', error);
+  }
+};
+
 function App() {
 
   const [editTargetFocus, setEditTargetFocus] = useState<Task | null>(null)
@@ -17,8 +47,21 @@ function App() {
   const [filterBy, setFilterBy] = useState<string>('All')
   const [reverseSort, setReverseSort] = useState<boolean>(false)
   const [sortBy, setSortBy] = useState<string>('Priority')
-  const [tasks, setTasks] = useState<Task[]>([])
+  const [tasks, setTasks] = useState<Task[]>(() => loadTasksFromStorage())
   const [editTask, setEditTask] = useState<Task | null>(null)
+
+  useEffect(() => {
+    const loadedTasks = loadTasksFromStorage();
+    if (loadedTasks.length > 0) {
+      setTasks(loadedTasks);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (tasks.length > 0 || localStorage.getItem(STORAGE_KEY)) {
+      saveTasksToStorage(tasks);
+    }
+  }, [tasks]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -79,9 +122,6 @@ function App() {
     }
     return result 
   } , [tasks, filterBy, sortBy, reverseSort])
-
-  
-  // add to localStorage
 
   return (
     <div className='flex align-middle justify-center bg-[url("./assets/background.jpg")] bg-cover bg-center bg-no-repeat min-h-screen p-8 sm:p-16 md:pt-10 md:px-18 lg:px-30 lg:py-20'>
