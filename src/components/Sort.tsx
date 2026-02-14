@@ -11,12 +11,12 @@ const Sort = ({sortBy, setSortBy, reverseSort, setReverseSort}: Props) => {
     return (
         <div className='flex flex-col gap-3 mb-16'>
             <div data-safe-click="true" className="flex flex-row gap-1">
-                <span className='text-xl block w-full'>Sort By:</span>
+                <span className='text-2xl font-semibold block w-full'>Sort By:</span>
                 <button className={"cursor-pointer rounded-full self-center p-2.5 text-xl text-cyan-900 " + (reverseSort ? "" : "bg-cyan-200")} onClick={() => setReverseSort(false)}><FaArrowUpWideShort /></button>
                 <button className={"cursor-pointer rounded-full self-center p-2.5 text-xl text-cyan-900 " + (reverseSort ? "bg-cyan-200" : "")} onClick={() => setReverseSort(true)}><FaArrowDownWideShort /></button>
             </div>
             
-            <div data-safe-click="true" className='grid grid-cols-3 gap-3 font-bold text-2xl text-center justify-center w-full border-2 rounded-4xl border-white/40 backdrop-blur-md'>
+            <div data-safe-click="true" className='grid grid-cols-3 gap-3 font-bold text-xl lg:text-2xl text-center justify-center w-full border-2 rounded-4xl border-white/40 backdrop-blur-md'>
                 <label className={
                     'border-2 rounded-4xl border-white/40 backdrop-blur-md cursor-pointer transition-all flex justify-center ' +
                     (sortBy === 'Priority' ? 'bg-transparent bg-linear-to-r from-pink-600/50 to-purple-600/50 bg-[length:100%_0.4em] bg-no-repeat bg-bottom' : 'bg-[#E6E6E6] ') +

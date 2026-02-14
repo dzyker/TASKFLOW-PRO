@@ -86,11 +86,11 @@ function App() {
 
   return (
     <div className='flex align-middle justify-center bg-[url("./assets/background.jpg")] bg-cover bg-center bg-no-repeat h-screen p-20'>
-      <div className='flex flex-col min-h-80 min-w-230 border-2 border-white/40 backdrop-blur rounded-4xl'>
+      <div className='flex flex-col lg:min-h-80 lg:min-w-230 border-2 border-white/40 backdrop-blur rounded-4xl'>
         <Header />
 
         <div className='flex flex-row gap-10 w-full px-6 py-4 h-full'>
-          <div className='flex flex-col w-4/5'>
+          <div className='flex flex-col'>
             <Form
               tasks={tasks}
               setTasks={setTasks}

@@ -44,13 +44,13 @@ const TasksList = ({
 
     const handleChangeFilter = (filterBy: string) => {
         if (filterBy === "All") {
-          setFilterBy("Completed")
+            setFilterBy("Completed")
         } else if (filterBy === "Completed") {
-          setFilterBy("Uncompleted")
+            setFilterBy("Uncompleted")
         } else {
-          setFilterBy("All")
+            setFilterBy("All")
         }
-      }
+    }
 
     const handleChangePriority = (task: Task, priority: number) => {
         task.priority = priority
@@ -61,7 +61,7 @@ const TasksList = ({
     const priorityColors = ['#be123c', '#f97316', '#84cc16', '#3b82f6']
 
     const prioritys = [1, 2, 3, 4]
-    
+
     const changeValues1 = (): void => {
         setEditTargetFocus(null)
         setEditTask(null)
@@ -73,13 +73,17 @@ const TasksList = ({
     }
 
     return (
-        <div className='flex flex-col w-full'>
-            <span
-                className='font-bold text-center cursor-pointer'
-                onClick={() => handleChangeFilter(filterBy)}
-            >
-                {filterBy + " Tasks:"}
-            </span>
+        <div className='flex flex-col'>
+            <div className="mb-2 text-xl lg:text-2xl flex flex-row justify-center gap-2 cursor-pointer" onClick={() => handleChangeFilter(filterBy)}>
+                <div className={"mt-1 w-3 h-3 self-center border rounded-full " + (filterBy === "All" ? "bg-gray-400" : filterBy === "Completed" ? "bg-green-400" : "bg-red-400")}></div>
+                <span
+                    className='font-semibold block text-center mr-4'
+                    
+                >
+                    {filterBy + " Tasks"}
+                </span>
+            </div>
+
             <ul>
                 {filteredTasks.length > 0 ? filteredTasks.map((task) => (
                     <li
@@ -112,7 +116,6 @@ const TasksList = ({
                             </button>
                             <span
                                 className='text-xl'
-                                onClick={(event) => event.stopPropagation()}
                             >
                                 {task.title}
                             </span>
@@ -149,7 +152,7 @@ const TasksList = ({
                         <div className={'flex-row w-full justify-around mb-1 ' + (editTargetFocus === task ? "flex" : "hidden")}>
                             <button
                                 className={'rounded-full border p-1 cursor-pointer ' + (editTask ? 'bg-lime-400' : '')}
-                                onClick={() => {handleEditTask(task)}}
+                                onClick={() => { handleEditTask(task) }}
                             >
                                 <MdEdit />
                             </button>
