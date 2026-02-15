@@ -44,7 +44,7 @@ function App() {
 
   const [editTargetFocus, setEditTargetFocus] = useState<Task | null>(null)
   const [priorityEdit, setPriorityEdit] = useState<Crypto | null>(null)
-  const [filterBy, setFilterBy] = useState<string>('All')
+  const [filterBy, setFilterBy] = useState<string>(1)
   const [reverseSort, setReverseSort] = useState<boolean>(false)
   const [sortBy, setSortBy] = useState<string>('Priority')
   const [tasks, setTasks] = useState<Task[]>(() => loadTasksFromStorage())
